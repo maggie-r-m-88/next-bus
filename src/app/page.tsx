@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
+import NearbyStops from "./components/NearbyStops";
 import dynamic from "next/dynamic";
 import stops from "@/resources/madrid_emt_stops.json";
-import NearbyStops from "./components/NearbyStops";
-import type { Stop } from "../types/stop";
+import type { Stop, NormalizedStop } from "../types/stop";
 
 const DynamicMap = dynamic(() => import("./components/Map"), {
   loading: () => <p>Loading map...</p>,
@@ -21,8 +21,9 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) ** 2;
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
@@ -31,11 +32,11 @@ export default function Home() {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [arrivals, setArrivals] = useState<Record<number, any[]>>({}); // stop_id -> arrivals
-
+  const [stopsWithArrivals, setStopsWithArrivals] = useState<NormalizedStop[]>([]);
   const radiusMeters = 300;
 
-  const nearbyStops: Stop[] = useMemo(() => {
+  // Nearby stops based on user location
+  const nearbyStops = useMemo(() => {
     if (!coords) return [];
     return stops
       .map((s) => ({
@@ -56,9 +57,33 @@ export default function Home() {
     setError("");
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+      async (pos) => {
+        const userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        setCoords(userCoords);
         setLoading(false);
+
+        // Fetch arrivals for nearby stops
+        if (nearbyStops.length === 0) return;
+
+        try {
+          const res = await fetch("/api/emt/arrivals", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              stopIds: nearbyStops.map((s) => s.stop_id),
+            }),
+          });
+
+          if (!res.ok) throw new Error("Failed to fetch arrivals");
+
+          const data: NormalizedStop[] = await res.json();
+          console.log("Normalized arrivals:", data);
+
+          setStopsWithArrivals(data);
+        } catch (err) {
+          console.error("Arrival fetch error", err);
+          setError("Failed to fetch arrivals");
+        }
       },
       () => {
         setError("Unable to retrieve your location");
@@ -66,38 +91,6 @@ export default function Home() {
       }
     );
   };
-
-  // Fetch arrivals for nearby stops
-  useEffect(() => {
-    if (nearbyStops.length === 0) return;
-
-    const fetchArrivals = async () => {
-      try {
-        const res = await fetch("/api/emt/arrivals", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ stopIds: nearbyStops.map((s) => s.stop_id) }),
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch arrivals");
-
-        const data: Record<number, any> = await res.json();
-        console.log("Arrivals data:", data);
-
-        // Normalize: stop_id -> arrivals[]
-        const normalized: Record<number, any[]> = {};
-        for (const stopId in data) {
-          normalized[stopId] = data[stopId]?.arrivals || [];
-        }
-
-        setArrivals(normalized);
-      } catch (err) {
-        console.error("Arrival fetch error", err);
-      }
-    };
-
-    fetchArrivals();
-  }, [nearbyStops]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
@@ -117,20 +110,17 @@ export default function Home() {
         {error && <p className="text-red-600 mt-2">{error}</p>}
 
         {/* Nearby stops table */}
-        {coords && nearbyStops.length > 0 && (
-          <NearbyStops stops={nearbyStops} arrivals={arrivals} />
+        {stopsWithArrivals.length > 0 && (
+          <NearbyStops stops={stopsWithArrivals} />
         )}
 
-        {/* Map (commented out for now) */}
+        {/* Map (commented for now) */}
         {/*
-        {coords && nearbyStops.length > 0 && (
+        {stopsWithArrivals.length > 0 && (
           <div className="w-full max-w-3xl h-[500px] mt-6">
             <DynamicMap
-              userPosition={[coords.lat, coords.lon]}
-              stops={nearbyStops.map((s) => ({
-                ...s,
-                arrivals: arrivals[s.stop_id] || [],
-              }))}
+              userPosition={coords ? [coords.lat, coords.lon] : [0, 0]}
+              stops={stopsWithArrivals}
             />
           </div>
         )}

@@ -1,13 +1,12 @@
 "use client";
 
-import type { Stop } from "@/types/stop";
+import type { NormalizedStop } from "@/types/stop";
 
 interface NearbyStopsProps {
-  stops: Stop[];
-  arrivals?: Record<number, any[]>;
+  stops: NormalizedStop[];
 }
 
-export default function NearbyStops({ stops, arrivals = {} }: NearbyStopsProps) {
+export default function NearbyStops({ stops }: NearbyStopsProps) {
   return (
     <table className="mt-4 w-full table-auto border border-gray-300 text-sm">
       <thead>
@@ -22,9 +21,7 @@ export default function NearbyStops({ stops, arrivals = {} }: NearbyStopsProps) 
       </thead>
       <tbody>
         {stops.map((stop) => {
-          const stopArrivals = arrivals[stop.stop_id] || [];
-
-          if (stopArrivals.length === 0) {
+          if (!stop.arrivals || stop.arrivals.length === 0) {
             return (
               <tr key={stop.stop_id} className="border">
                 <td className="border px-2 py-1">{stop.stop_name}</td>
@@ -35,14 +32,14 @@ export default function NearbyStops({ stops, arrivals = {} }: NearbyStopsProps) 
             );
           }
 
-          return stopArrivals.map((arr, idx) => (
+          return stop.arrivals.map((arr, idx) => (
             <tr key={`${stop.stop_id}-${idx}`} className="border">
               <td className="border px-2 py-1">{stop.stop_name}</td>
               <td className="border px-2 py-1">{arr.line}</td>
               <td className="border px-2 py-1">{arr.destination}</td>
               <td className="border px-2 py-1">{Math.ceil(arr.estimateArrive / 60)}</td>
-              <td className="border px-2 py-1">{stop.stop_lat}</td>
-              <td className="border px-2 py-1">{stop.stop_lon}</td>
+              <td className="border px-2 py-1">{stop.lat}</td>
+              <td className="border px-2 py-1">{stop.lon}</td>
             </tr>
           ));
         })}
