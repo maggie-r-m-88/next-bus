@@ -1,6 +1,14 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import NearbyStops from "./components/NearbyStops";
+
+// Dynamically import MapView to prevent server-side errors
+const DynamicMap = dynamic(() => import("./components/Map"), {
+  loading: () => <p>Loading map...</p>,
+  ssr: false,
+});
 
 export default function Home() {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
@@ -36,11 +44,11 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black font-sans">
-      <main className="flex flex-col items-center gap-6 py-32 px-16 bg-white dark:bg-black sm:items-center">
+      <main className="flex flex-col items-center gap-6 py-32 px-16 bg-white dark:bg-black sm:items-center w-full max-w-6xl rounded-lg shadow-lg">
         <h1 className="text-3xl font-semibold text-black dark:text-zinc-50 text-center">
           EMT ETAs Near Me
         </h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 text-center max-w-md">
+        <p className="text-lg text-zinc-600 dark:text-zinc-400 text-center w-full">
           Click the button below to find buses arriving closest to you in real-time.
         </p>
 
@@ -76,9 +84,15 @@ export default function Home() {
           <p className="mt-4 text-red-600 dark:text-red-400 text-center">{error}</p>
         )}
 
-        {coords && (
-          <NearbyStops lat={coords.lat} lon={coords.lon} radiusMeters={300} />
-        )}
+        {coords && <NearbyStops lat={coords.lat} lon={coords.lon} radiusMeters={300} />}
+
+       {coords && (
+  <div className="w-full max-w-3xl mt-6 border rounded-lg h-[500px]">
+    <DynamicMap userPosition={[coords.lat, coords.lon]} />
+  </div>
+)}
+
+
       </main>
     </div>
   );
