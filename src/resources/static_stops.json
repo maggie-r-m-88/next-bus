@@ -1,0 +1,123 @@
+[
+    {
+        "stop_id": 563,
+        "stop_name": "Metro Vía Carpetana",
+        "lat": 40.39369140286066,
+        "lon": -3.74016720001325,
+        "arrivals": [
+            {
+                "line": "17",
+                "destination": "PARQUE EUROPA",
+                "estimateArrive": 946,
+                "arrivalTimeInMinutes": 15
+            }
+        ]
+    },
+    {
+        "stop_id": 564,
+        "stop_name": "Vía Carpetana-Laguna",
+        "lat": 40.39170251147493,
+        "lon": -3.742649941727063,
+        "arrivals": [
+            {
+                "line": "17",
+                "destination": "PARQUE EUROPA",
+                "estimateArrive": 1025,
+                "arrivalTimeInMinutes": 17
+            }
+        ]
+    },
+    {
+        "stop_id": 565,
+        "stop_name": "Vía Carpetana-Laguna",
+        "lat": 40.39217688514311,
+        "lon": -3.74172948510937,
+        "arrivals": []
+    },
+    {
+        "stop_id": 639,
+        "stop_name": "Valvanera-Laguna",
+        "lat": 40.39397465157669,
+        "lon": -3.742361910885463,
+        "arrivals": []
+    },
+    {
+        "stop_id": 2553,
+        "stop_name": "Carpetana",
+        "lat": 40.39329367935313,
+        "lon": -3.741078218412361,
+        "arrivals": [
+            {
+                "line": "SC2",
+                "destination": "CUATRO CAMINOS",
+                "estimateArrive": 0,
+                "arrivalTimeInMinutes": 0
+            },
+            {
+                "line": "55",
+                "destination": "BATAN",
+                "estimateArrive": 170,
+                "arrivalTimeInMinutes": 2
+            },
+            {
+                "line": "SC2",
+                "destination": "CUATRO CAMINOS",
+                "estimateArrive": 389,
+                "arrivalTimeInMinutes": 6
+            },
+            {
+                "line": "119",
+                "destination": "BARRIO GOYA",
+                "estimateArrive": 1041,
+                "arrivalTimeInMinutes": 17
+            },
+            {
+                "line": "55",
+                "destination": "BATAN",
+                "estimateArrive": 1141,
+                "arrivalTimeInMinutes": 19
+            }
+        ]
+    },
+    {
+        "stop_id": 3165,
+        "stop_name": "Arroyo de las Pavas",
+        "lat": 40.392770758832654,
+        "lon": -3.739025985324779,
+        "arrivals": [
+            {
+                "line": "119",
+                "destination": "BARRIO GOYA",
+                "estimateArrive": 974,
+                "arrivalTimeInMinutes": 16
+            }
+        ]
+    },
+    {
+        "stop_id": 3166,
+        "stop_name": "Arroyo de las Pavas",
+        "lat": 40.392643135277304,
+        "lon": -3.739260244192498,
+        "arrivals": []
+    },
+    {
+        "stop_id": 4766,
+        "stop_name": "Carpetana",
+        "lat": 40.39276871499728,
+        "lon": -3.740755071000469,
+        "arrivals": [
+            {
+                "line": "SC1",
+                "destination": "LEGAZPI",
+                "estimateArrive": 128,
+                "arrivalTimeInMinutes": 2
+            },
+            {
+                "line": "SC1",
+                "destination": "LEGAZPI",
+                "estimateArrive": 161,
+                "arrivalTimeInMinutes": 2
+            }
+        ]
+    }
+]
