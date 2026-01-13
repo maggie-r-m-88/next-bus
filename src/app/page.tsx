@@ -1,19 +1,55 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
+import stops from "@/resources/madrid_emt_stops.json";
 import NearbyStops from "./components/NearbyStops";
+import type { Stop } from "@/types/stop";
 
-// Dynamically import MapView to prevent server-side errors
+
+
 const DynamicMap = dynamic(() => import("./components/Map"), {
   loading: () => <p>Loading map...</p>,
   ssr: false,
 });
 
+// Haversine distance (meters)
+function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371000;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) *
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 export default function Home() {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [arrivals, setArrivals] = useState<Record<number, any>>({});
+  const [arrivalsLoading, setArrivalsLoading] = useState(false);
+
+  const radiusMeters = 300;
+
+  const nearbyStops: Stop[] = useMemo(() => {
+    if (!coords) return [];
+
+    return stops
+      .map((stop: Stop) => ({
+        ...stop,
+        distance: getDistance(coords.lat, coords.lon, stop.stop_lat, stop.stop_lon),
+      }))
+      .filter((stop) => stop.distance! <= radiusMeters)
+      .sort((a, b) => a.distance! - b.distance!);
+  }, [coords]);
 
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
@@ -23,76 +59,95 @@ export default function Home() {
 
     setLoading(true);
     setError("");
-    setCoords(null);
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      (pos) => {
         setCoords({
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
         });
         setLoading(false);
       },
-      (err) => {
-        console.error(err);
+      () => {
         setError("Unable to retrieve your location");
         setLoading(false);
-      },
-      { enableHighAccuracy: true }
+      }
     );
   };
 
+  useEffect(() => {
+    fetch("/api/emt/auth")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("EMT token ready");
+      })
+      .catch(() => {
+        console.error("Failed to authenticate EMT API");
+      });
+  }, []);
+
+  useEffect(() => {
+    if (nearbyStops.length === 0) return;
+
+    const fetchArrivals = async () => {
+      setArrivalsLoading(true);
+
+      try {
+        const res = await fetch("/api/emt/arrivals", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            stopIds: nearbyStops.map((s) => s.stop_id),
+          }),
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch arrivals");
+
+        const data = await res.json();
+
+        console.log("Arrivals data:", data);
+        setArrivals(data);
+      } catch (err) {
+        console.error("Arrival fetch error", err);
+      } finally {
+        setArrivalsLoading(false);
+      }
+    };
+
+    fetchArrivals();
+  }, [nearbyStops]);
+
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black font-sans">
-      <main className="flex flex-col items-center gap-6 py-32 px-16 bg-white dark:bg-black sm:items-center w-full max-w-6xl rounded-lg shadow-lg">
-        <h1 className="text-3xl font-semibold text-black dark:text-zinc-50 text-center">
-          EMT ETAs Near Me
-        </h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 text-center w-full">
-          Click the button below to find buses arriving closest to you in real-time.
-        </p>
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
+      <main className="w-full max-w-6xl flex flex-col items-center gap-6 py-32 px-16 bg-white dark:bg-black rounded-lg shadow-lg">
+
+        <h1 className="text-3xl font-semibold">EMT ETAs Near Me</h1>
 
         <button
           onClick={handleUseMyLocation}
           disabled={loading}
-          className="mt-6 flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-white text-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="rounded-full bg-blue-600 px-6 py-3 text-white"
         >
-          <svg
-            className="h-5 w-5"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M19.5 10.5c0 7.5-7.5 12-7.5 12s-7.5-4.5-7.5-12a7.5 7.5 0 1115 0z"
-            />
-          </svg>
           {loading ? "Locating..." : "Find Nearby Stops"}
         </button>
 
-        {error && (
-          <p className="mt-4 text-red-600 dark:text-red-400 text-center">{error}</p>
+        {error && <p className="text-red-600">{error}</p>}
+
+        {coords && (
+          <>
+            <NearbyStops stops={nearbyStops} />
+
+            <div className="w-full max-w-3xl h-[500px] mt-6">
+              <DynamicMap
+                userPosition={[coords.lat, coords.lon]}
+                stops={nearbyStops}
+              />
+            </div>
+          </>
         )}
-
-        {coords && <NearbyStops lat={coords.lat} lon={coords.lon} radiusMeters={300} />}
-
-       {coords && (
-  <div className="w-full max-w-3xl mt-6 border rounded-lg h-[500px]">
-    <DynamicMap userPosition={[coords.lat, coords.lon]} />
-  </div>
-)}
-
-
       </main>
     </div>
   );

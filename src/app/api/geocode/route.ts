@@ -1,5 +1,6 @@
 // app/api/geocode/route.ts
 import { NextResponse } from "next/server";
+import { getEmtAccessToken } from "@/lib/emtAuth";
 
 // Simple in-memory cache
 const cache: Record<string, { lat: string; lon: string }> = {};
