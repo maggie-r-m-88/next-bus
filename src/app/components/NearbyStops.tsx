@@ -1,18 +1,52 @@
 "use client";
+
 import type { Stop } from "@/types/stop";
 
-export default function NearbyStops({ stops }: { stops: Stop[] }) {
-  if (stops.length === 0) {
-    return <p>No stops found nearby.</p>;
-  }
+interface NearbyStopsProps {
+  stops: Stop[];
+  arrivals?: Record<number, any[]>;
+}
 
+export default function NearbyStops({ stops, arrivals = {} }: NearbyStopsProps) {
   return (
-    <ul className="mt-4 text-center">
-      {stops.map((stop) => (
-        <li key={stop.stop_id}>
-          {stop.stop_name} ({(stop.distance! / 1000).toFixed(2)} km)
-        </li>
-      ))}
-    </ul>
+    <table className="mt-4 w-full table-auto border border-gray-300 text-sm">
+      <thead>
+        <tr className="bg-gray-100 dark:bg-gray-800">
+          <th className="border px-2 py-1">Stop Name</th>
+          <th className="border px-2 py-1">Line</th>
+          <th className="border px-2 py-1">Direction</th>
+          <th className="border px-2 py-1">ETA (min)</th>
+          <th className="border px-2 py-1">Lat</th>
+          <th className="border px-2 py-1">Lon</th>
+        </tr>
+      </thead>
+      <tbody>
+        {stops.map((stop) => {
+          const stopArrivals = arrivals[stop.stop_id] || [];
+
+          if (stopArrivals.length === 0) {
+            return (
+              <tr key={stop.stop_id} className="border">
+                <td className="border px-2 py-1">{stop.stop_name}</td>
+                <td colSpan={5} className="border px-2 py-1 text-center">
+                  No arrivals
+                </td>
+              </tr>
+            );
+          }
+
+          return stopArrivals.map((arr, idx) => (
+            <tr key={`${stop.stop_id}-${idx}`} className="border">
+              <td className="border px-2 py-1">{stop.stop_name}</td>
+              <td className="border px-2 py-1">{arr.line}</td>
+              <td className="border px-2 py-1">{arr.destination}</td>
+              <td className="border px-2 py-1">{Math.ceil(arr.estimateArrive / 60)}</td>
+              <td className="border px-2 py-1">{stop.stop_lat}</td>
+              <td className="border px-2 py-1">{stop.stop_lon}</td>
+            </tr>
+          ));
+        })}
+      </tbody>
+    </table>
   );
 }

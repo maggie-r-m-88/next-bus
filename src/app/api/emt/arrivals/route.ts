@@ -5,41 +5,43 @@ import type { NormalizedStop } from "@/types/stop";
 export async function POST(req: Request) {
 
     function normalizeArrivals(rawData: any): NormalizedStop[] {
-        const stopsMap: Record<string, NormalizedStop> = {};
+    const stopsMap: Record<string, NormalizedStop> = {};
 
-        for (const stopObj of rawData.data) {
-            const stopInfo = stopObj.StopInfo?.[0];
-            const arriveArray = stopObj.Arrive || [];
+    for (const stopObj of rawData.data) {
+        const stopInfo = stopObj.StopInfo?.[0];
+        const arriveArray = stopObj.Arrive || [];
 
-            if (!stopInfo) continue;
+        if (!stopInfo) continue;
 
-            const stopId = stopInfo.stopId;
-            const lat = stopInfo.geometry.coordinates[1];
-            const lon = stopInfo.geometry.coordinates[0];
-            const stopName = stopInfo.stopName;
+        const stopId = stopInfo.stopId;
+        const lat = stopInfo.geometry.coordinates[1];
+        const lon = stopInfo.geometry.coordinates[0];
+        const stopName = stopInfo.stopName;
 
-            if (!stopsMap[stopId]) {
-                stopsMap[stopId] = {
-                    stop_id: stopId,
-                    stop_name: stopName,
-                    lat,
-                    lon,
-                    arrivals: [],
-                };
-            }
-
-            // Add each arrival for this stop
-            for (const a of arriveArray) {
-                stopsMap[stopId].arrivals.push({
-                    line: a.line,
-                    destination: a.destination,
-                    estimateArrive: a.estimateArrive,
-                });
-            }
+        if (!stopsMap[stopId]) {
+            stopsMap[stopId] = {
+                stop_id: stopId,
+                stop_name: stopName,
+                lat,
+                lon,
+                arrivals: [],
+            };
         }
 
-        return Object.values(stopsMap);
+        // Add each arrival for this stop
+        for (const a of arriveArray) {
+            stopsMap[stopId].arrivals.push({
+                line: a.line,
+                destination: a.destination,
+                estimateArrive: a.estimateArrive,
+                arrivalTimeInMinutes: Math.round(a.estimateArrive / 60), // new field
+            });
+        }
     }
+
+    return Object.values(stopsMap);
+}
+
 
 
     try {

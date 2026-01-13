@@ -3,6 +3,7 @@ export interface Arrival {
   line: string;
   destination: string;
   estimateArrive: number;
+    arrivalTimeInMinutes: number;
 }
 
 export interface NormalizedStop {
