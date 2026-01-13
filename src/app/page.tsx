@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import NearbyStops from "./components/NearbyStops";
 
 export default function Home() {
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
@@ -43,7 +44,6 @@ export default function Home() {
           Click the button below to find buses arriving closest to you in real-time.
         </p>
 
-        {/* Main map-pin button */}
         <button
           onClick={handleUseMyLocation}
           disabled={loading}
@@ -69,17 +69,15 @@ export default function Home() {
               d="M19.5 10.5c0 7.5-7.5 12-7.5 12s-7.5-4.5-7.5-12a7.5 7.5 0 1115 0z"
             />
           </svg>
-          {loading ? "Locating..." : "Find Buses Near Me"}
+          {loading ? "Locating..." : "Find Nearby Stops"}
         </button>
 
-        {/* Display results */}
-        {coords && (
-          <p className="mt-4 text-green-600 dark:text-green-400 text-center">
-            Latitude: {coords.lat.toFixed(6)}, Longitude: {coords.lon.toFixed(6)}
-          </p>
-        )}
         {error && (
           <p className="mt-4 text-red-600 dark:text-red-400 text-center">{error}</p>
+        )}
+
+        {coords && (
+          <NearbyStops lat={coords.lat} lon={coords.lon} radiusMeters={300} />
         )}
       </main>
     </div>
