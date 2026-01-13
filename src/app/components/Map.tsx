@@ -6,6 +6,7 @@ import stopsData from "@/resources/static_stops.json";
 import { Icon } from "leaflet";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 
+
 interface Arrival {
   line: string;
   destination: string;
@@ -30,8 +31,8 @@ export default function MyMap({ userPosition }: MapProps) {
       center={userPosition}
       zoom={20}
       scrollWheelZoom={true}
-      className="w-full h-[500px] rounded-lg shadow-md"
-      style={{ height: "500px", width: "100%" }}
+      className="w-full h-[100vh] rounded-lg shadow-md"
+      style={{ height: "100vh", width: "100%" }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -45,7 +46,7 @@ export default function MyMap({ userPosition }: MapProps) {
             key={stop.stop_id}
             position={[stop.lat, stop.lon]}
             icon={new Icon({
-              iconUrl: markerIconPng,
+              iconUrl: "/leaflet/marker-icon.png",
               iconSize: [25, 41],
               iconAnchor: [12, 41],
             })}
