@@ -2,38 +2,40 @@
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
-import type { Stop } from "@/types/stop";
+import L from "leaflet";
+import staticStops from "@/resources/static_stops.json";
+import type { NormalizedStop } from "@/types/stop";
+
+// Fix default icon issue
+
 
 interface MapProps {
   userPosition: [number, number];
-  stops: Stop[];
 }
 
-export default function MyMap({ userPosition, stops }: MapProps) {
+export default function Map({ userPosition }: MapProps) {
   return (
     <MapContainer
       center={userPosition}
       zoom={15}
-      style={{ height: "500px", width: "100%" }}
+      scrollWheelZoom={true}
+      className="w-full h-full rounded-lg shadow-md"
+     style={{ height: "500px" }}
+
     >
       <TileLayer
-        attribution="&copy; OpenStreetMap"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
       />
 
-      {/* User */}
+      {/* User marker */}
       <Marker position={userPosition}>
-        <Popup>You are here</Popup>
+        <Popup>Your location</Popup>
       </Marker>
 
-      {/* Nearby stops */}
-      {stops.map((stop) => (
-        <Marker
-          key={stop.stop_id}
-          position={[stop.stop_lat, stop.stop_lon]}
-        >
+      {/* Stops from JSON */}
+      {staticStops.map((stop: NormalizedStop) => (
+        <Marker key={stop.stop_id} position={[stop.lat, stop.lon]}>
           <Popup>{stop.stop_name}</Popup>
         </Marker>
       ))}
