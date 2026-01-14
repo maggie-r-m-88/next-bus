@@ -52,7 +52,7 @@ export default function MyMap({ userPosition }: MapProps) {
                         })}
                     >
                         {/* Tooltip: quick summary of lines */}
-                        <Tooltip permanent direction="top" offset={[0, -10]}>
+                        <Tooltip permanent direction="top" offset={[0, -10]} className="tooltipContainer ">
                             {stop.arrivals!.map((a) => a.line).join(", ")}
                         </Tooltip>
 
@@ -60,7 +60,7 @@ export default function MyMap({ userPosition }: MapProps) {
                         <Popup className="popupContainer">
                             <div className="overflow-hidden rounded-lg shadow-lg">
                                 {/* Header */}
-                                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-3">
+                                <div className="bg-gradient-to-r from-[var(--brand-dark-blue)] to-indigo-500 px-3 py-2">
                                     <div className="font-semibold text-white text-base">
                                         {stop.stop_name}
                                     </div>
@@ -68,27 +68,38 @@ export default function MyMap({ userPosition }: MapProps) {
 
                                 {/* Routes List */}
                                 <div className="bg-white">
-                                    {stop.arrivals!.map((arr, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
-                                        >
-                                            {/* Line Badge */}
-                                            <div className="bg-indigo-100 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-md min-w-[45px] text-center border-2 border-indigo-200">
-                                                {arr.line}
-                                            </div>
+                                    {stop.arrivals!.map((arr, idx) => {
+                                        const minutes = arr.arrivalTimeInMinutes;
+                                        const isImmediate = minutes === 0;
 
-                                            {/* Destination */}
-                                            <div className="flex-1 text-sm text-gray-700 font-medium">
-                                                {arr.destination}
-                                            </div>
+                                        const timeColor = isImmediate
+                                            ? "text-red-600"
+                                            : minutes <= 5
+                                            ? "text-green-600"
+                                            : "text-gray-600";
 
-                                            {/* Time */}
-                                            <div className="text-sm font-bold text-indigo-600 whitespace-nowrap">
-                                                {arr.arrivalTimeInMinutes} min
+                                        return (
+                                            <div
+                                                key={idx}
+                                                className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+                                            >
+                                                {/* Line Badge */}
+                                                <div className="bg-indigo-100 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-md min-w-[45px] text-center border-2 border-indigo-200">
+                                                    {arr.line}
+                                                </div>
+
+                                                {/* Destination */}
+                                                <div className="flex-1 text-sm text-gray-700 font-medium">
+                                                    {arr.destination}
+                                                </div>
+
+                                                {/* Time */}
+                                                <div className={`text-sm font-bold ${timeColor} whitespace-nowrap`}>
+                                                    {isImmediate ? "Now" : `${minutes} min`}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </Popup>

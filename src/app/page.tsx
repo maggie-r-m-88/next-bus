@@ -11,7 +11,7 @@ const DynamicMap = dynamic(() => import("./components/Map"), {
   ssr: false,
 });
 
-const RADIUS_METERS = 100;
+const RADIUS_METERS = 200;
 
 // Haversine formula (meters)
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -135,7 +135,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen justify-center bg-zinc-50 dark:bg-black">
-      <main className="w-full md:max-w-6xl flex flex-col gap-6 py-8 md:px-6 bg-white dark:bg-black rounded-lg shadow-lg">
+      <main className="w-full md:max-w-6xl flex flex-col py-8 md:px-6 bg-white dark:bg-black rounded-lg shadow-lg">
         {/* Header */}
         <div className="flex w-full justify-between items-center px-2 md:px-6 mt-4">
           <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">
@@ -145,7 +145,7 @@ export default function Home() {
           <button
             onClick={handleUseMyLocation}
             disabled={loading}
-            className="flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-blue-700 font-semibold disabled:opacity-60"
+            className="flex items-center gap-2 rounded-full bg-[var(--brand-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-indigo-500 font-semibold disabled:opacity-60"
           >
             {loading ? "Loading…" : "Find Nearby Stops"}
           </button>
@@ -177,13 +177,13 @@ export default function Home() {
 
         {/* Content */}
         {coords && activeTab === "map" && (
-          <div className="w-full h-full mt-[-20px]">
+          <div className="w-full h-full">
             <DynamicMap userPosition={[coords.lat, coords.lon]} />
           </div>
         )}
 
         {coords && activeTab === "stops" && (
-          <div className="w-full px-2 md:px-6">
+          <div className="w-full px-2 md:px-6 bg-[#ecf1f7] pt-4 md:pt-8">
             {loading ? (
               <p className="text-gray-500">Loading arrivals…</p>
             ) : stopsWithArrivals.length === 0 ? (
