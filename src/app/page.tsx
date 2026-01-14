@@ -177,10 +177,14 @@ export default function Home() {
 
         {/* Content */}
         {coords && activeTab === "map" && (
-          <div className="w-full h-full">
-            <DynamicMap userPosition={[coords.lat, coords.lon]} />
-          </div>
-        )}
+        <div className="w-full h-full">
+          <DynamicMap 
+            userPosition={[coords.lat, coords.lon]} 
+            stops={stopsWithArrivals} // <-- pass fetched stops here
+          />
+        </div>
+      )}
+
 
         {coords && activeTab === "stops" && (
           <div className="w-full px-2 md:px-6 bg-[#ecf1f7] pt-4 md:pt-8">
