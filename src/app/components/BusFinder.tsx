@@ -138,7 +138,7 @@ export default function BusFinder() {
     return (
        <div className="flex flex-col flex-1 min-h-0">
   {/* Tabs + Button - Fixed, not sticky */}
-  <div className="flex-shrink-0 z-40 bg-white dark:bg-black border-b border-gray-200 px-4 py-2">
+  <div className="flex-shrink-0 z-40 bg-white dark:bg-black border-b border-gray-200 px-4 py-2 touch-none">
     <div className="flex items-center justify-between py-2">
       {/* Left tabs */}
       <div className="flex gap-2">
