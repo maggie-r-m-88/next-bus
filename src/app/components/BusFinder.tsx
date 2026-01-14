@@ -136,8 +136,9 @@ export default function BusFinder() {
     };
 
     return (
-        <div className="flex flex-col flex-1 ">
-            <div className="sticky top-0 z-40 bg-white dark:bg-black px-2 md:px-6 overflow-y-hidden">
+        <div className="flex flex-col flex-1 overflow-hidden">
+            {/* Sticky Tabs & Button */}
+            <div className="sticky top-0 z-40 bg-white dark:bg-black px-2 md:px-6 border-b border-gray-200">
                 <div className="flex items-center justify-between py-2">
                     {/* Left: Tabs */}
                     <div className="flex gap-2">
@@ -180,23 +181,24 @@ export default function BusFinder() {
                 </div>
             </div>
 
-
-            {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Content area - Map should NOT scroll, List should */}
+            <div className="flex-1 overflow-hidden">
                 {coords && activeTab === "map" && (
-                    <DynamicMap
-                        userPosition={[coords.lat, coords.lon]}
-                        stops={stopsWithArrivals.map((s) => ({
-                            ...s,
-                            stop_id: Number(s.stop_id),
-                            lat: s.lat,
-                            lon: s.lon,
-                        }))}
-                    />
+                    <div className="h-full w-full">
+                        <DynamicMap
+                            userPosition={[coords.lat, coords.lon]}
+                            stops={stopsWithArrivals.map((s) => ({
+                                ...s,
+                                stop_id: Number(s.stop_id),
+                                lat: s.lat,
+                                lon: s.lon,
+                            }))}
+                        />
+                    </div>
                 )}
 
                 {coords && activeTab === "stops" && (
-                    <div className="px-3 md:px-8 bg-[#ecf1f7] py-3 md:py-8">
+                    <div className="h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] py-3 md:py-8">
                         {loading ? (
                             <p className="text-gray-500">Loading arrivals…</p>
                         ) : stopsWithArrivals.length === 0 ? (

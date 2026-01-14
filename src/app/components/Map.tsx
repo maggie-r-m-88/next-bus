@@ -32,8 +32,8 @@ export default function DynamicMap({ userPosition, stops }: MapProps) {
       center={userPosition}
       zoom={20}
       scrollWheelZoom={true}
-      className="w-full h-[90vh] rounded-lg shadow-md"
-      style={{ height: "100vh", width: "100%" }}
+      className="w-full h-full"
+      style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
