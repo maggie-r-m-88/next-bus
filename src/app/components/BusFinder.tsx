@@ -136,76 +136,80 @@ export default function BusFinder() {
     };
 
     return (
-        <div className="flex flex-col w-full">
-            {/* Tabs + Button */}
-            <div className="sticky top-16 z-40 flex items-center justify-between bg-white dark:bg-black mt-4 md:pb-4 px-2 border-b border-gray-300">
-                <div className="flex">
-                    <button
-                        onClick={() => setActiveTab("map")}
-                        className={`px-4 py-2 -mb-px font-medium ${activeTab === "map"
-                                ? "border-b-3 border-[var(--brand-blue)] text-blue-600 font-semibold"
-                                : "text-gray-500"
-                            }`}
-                    >
-                        Map
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("stops")}
-                        className={`px-4 py-2 -mb-px font-medium ${activeTab === "stops"
-                                ? "border-b-2 border-blue-600 text-blue-600"
-                                : "text-gray-500"
-                            }`}
-                    >
-                        List
-                    </button>
-                </div>
+        <div className="flex flex-col flex-1 overflow-y-auto">
+            <div className="sticky top-0 z-40 bg-white dark:bg-black px-2 md:px-6">
+  <div className="flex items-center justify-between py-2">
+    {/* Left: Tabs */}
+    <div className="flex gap-2">
+      <button
+        onClick={() => setActiveTab("map")}
+        className={`px-4 py-2 -mb-px font-medium ${
+          activeTab === "map"
+            ? "border-b-3 border-[var(--brand-blue)] text-blue-600 font-semibold"
+            : "text-gray-500"
+        }`}
+      >
+        Map
+      </button>
+      <button
+        onClick={() => setActiveTab("stops")}
+        className={`px-4 py-2 -mb-px font-medium ${
+          activeTab === "stops"
+            ? "border-b-2 border-blue-600 text-blue-600"
+            : "text-gray-500"
+        }`}
+      >
+        List
+      </button>
+    </div>
 
-                <button
-                    onClick={handleUseMyLocation}
-                    disabled={loading}
-                    className="flex items-center gap-2 rounded-full bg-[var(--brand-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-indigo-500 font-semibold disabled:opacity-60 mb-2"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z" />
-                    </svg>
-                    {loading ? "Loading…" : "Buses Near Me"}
-                </button>
+    {/* Right: Button */}
+    <button
+      onClick={handleUseMyLocation}
+      disabled={loading}
+      className="flex items-center gap-2 rounded-full bg-[var(--brand-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-indigo-500 font-semibold disabled:opacity-60"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z" />
+      </svg>
+      {loading ? "Loading…" : "Buses Near Me"}
+    </button>
+  </div>
+</div>
+
+
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto">
+                {coords && activeTab === "map" && (
+                    <DynamicMap
+                        userPosition={[coords.lat, coords.lon]}
+                        stops={stopsWithArrivals.map((s) => ({
+                            ...s,
+                            stop_id: Number(s.stop_id),
+                            lat: s.lat,
+                            lon: s.lon,
+                        }))}
+                    />
+                )}
+
+                {coords && activeTab === "stops" && (
+                    <div className="px-3 md:px-8 bg-[#ecf1f7] py-3 md:py-8">
+                        {loading ? (
+                            <p className="text-gray-500">Loading arrivals…</p>
+                        ) : stopsWithArrivals.length === 0 ? (
+                            <p className="text-gray-500">No nearby stops found.</p>
+                        ) : (
+                            <NearbyStops stops={stopsWithArrivals} />
+                        )}
+                    </div>
+                )}
             </div>
-
-
-            {/* Map */}
-            {coords && activeTab === "map" && (
-                <div className="w-full h-full">
-                   <DynamicMap
-  userPosition={[coords.lat, coords.lon]}
-  stops={stopsWithArrivals.map(s => ({
-    ...s,
-    stop_id: Number(s.stop_id), // convert string to number
-    lat: s.lat,
-    lon: s.lon,
-  }))}
-/>
-
-                </div>
-            )}
-
-            {/* Nearby stops */}
-            {coords && activeTab === "stops" && (
-                <div className="w-full px-3 md:px-8 bg-[#ecf1f7] h-[100vh] overflow-y-auto py-3 md:py-8">
-                    {loading ? (
-                        <p className="text-gray-500">Loading arrivals…</p>
-                    ) : stopsWithArrivals.length === 0 ? (
-                        <p className="text-gray-500">No nearby stops found.</p>
-                    ) : (
-                        <NearbyStops stops={stopsWithArrivals} />
-                    )}
-                </div>
-            )}
         </div>
+
     );
 }
