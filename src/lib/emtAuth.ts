@@ -2,28 +2,30 @@ let accessToken: string | null = null;
 let tokenExpiresAt: number | null = null;
 
 export async function getEmtAccessToken(): Promise<string> {
-  let accessToken: string | null = null;
-  let tokenExpiresAt = 0;
-
-  if (!accessToken || Date.now() > tokenExpiresAt) {
-    const res = await fetch(`${process.env.EMT_AUTH_URL}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ClientId: process.env.EMT_CLIENT_ID,
-        ClientSecret: process.env.EMT_CLIENT_SECRET,
-      }),
-    });
-
-    const data = await res.json();
-    accessToken = data.data[0].accessToken;
-    tokenExpiresAt = Date.now() + data.data[0].tokenSecExpiration * 1000;
+  // Reuse token if still valid (with 1 min buffer)
+  if (accessToken && tokenExpiresAt && Date.now() < tokenExpiresAt - 60_000) {
+    return accessToken;
   }
 
-  if (!accessToken) throw new Error("EMT access token not returned");
+  const res = await fetch(
+    "https://openapi.emtmadrid.es/v1/mobilitylabs/user/login",
+    {
+      method: "GET",
+      headers: {
+        email: process.env.EMT_EMAIL!,
+        password: process.env.EMT_PASSWORD!,
+      },
+    }
+  );
 
-  return accessToken; // Now TypeScript knows it's definitely a string
+  if (!res.ok) {
+    throw new Error("Failed to authenticate with EMT API");
+  }
+
+  const data = await res.json();
+
+  accessToken = data.data[0].accessToken;
+  tokenExpiresAt = Date.now() + data.data[0].tokenSecExpiration * 1000;
+
+  return accessToken;
 }
-

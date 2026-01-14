@@ -15,8 +15,6 @@ export default function NearbyStops({ stops }: NearbyStopsProps) {
           <th className="border px-2 py-1">Line</th>
           <th className="border px-2 py-1">Direction</th>
           <th className="border px-2 py-1">ETA (min)</th>
-          <th className="border px-2 py-1">Lat</th>
-          <th className="border px-2 py-1">Lon</th>
         </tr>
       </thead>
       <tbody>
@@ -38,8 +36,6 @@ export default function NearbyStops({ stops }: NearbyStopsProps) {
               <td className="border px-2 py-1">{arr.line}</td>
               <td className="border px-2 py-1">{arr.destination}</td>
               <td className="border px-2 py-1">{Math.ceil(arr.estimateArrive / 60)}</td>
-              <td className="border px-2 py-1">{stop.lat}</td>
-              <td className="border px-2 py-1">{stop.lon}</td>
             </tr>
           ));
         })}
