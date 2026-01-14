@@ -8,69 +8,92 @@ import markerIconPng from "leaflet/dist/images/marker-icon.png";
 
 
 interface Arrival {
-  line: string;
-  destination: string;
-  arrivalTimeInMinutes: number;
+    line: string;
+    destination: string;
+    arrivalTimeInMinutes: number;
 }
 
 interface Stop {
-  stop_id: number;
-  stop_name: string;
-  lat: number;
-  lon: number;
-  arrivals?: Arrival[];
+    stop_id: number;
+    stop_name: string;
+    lat: number;
+    lon: number;
+    arrivals?: Arrival[];
 }
 
 interface MapProps {
-  userPosition: [number, number];
+    userPosition: [number, number];
 }
 
 export default function MyMap({ userPosition }: MapProps) {
-  return (
-    <MapContainer
-      center={userPosition}
-      zoom={20}
-      scrollWheelZoom={true}
-      className="w-full h-[100vh] rounded-lg shadow-md"
-      style={{ height: "100vh", width: "100%" }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    return (
+        <MapContainer
+            center={userPosition}
+            zoom={20}
+            scrollWheelZoom={true}
+            className="w-full h-[100vh] rounded-lg shadow-md"
+            style={{ height: "100vh", width: "100%" }}
+        >
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
 
-      {stopsData
-        .filter((stop) => stop.arrivals && stop.arrivals.length > 0)
-        .map((stop: Stop) => (
-          <Marker
-            key={stop.stop_id}
-            position={[stop.lat, stop.lon]}
-            icon={new Icon({
-              iconUrl: "/leaflet/marker-icon.png",
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-            })}
-          >
-            {/* Tooltip: quick summary of lines */}
-            <Tooltip permanent direction="top" offset={[0, -10]}>
-              {stop.arrivals!.map((a) => a.line).join(", ")}
-            </Tooltip>
+            {stopsData
+                .filter((stop) => stop.arrivals && stop.arrivals.length > 0)
+                .map((stop: Stop) => (
+                    <Marker
+                        key={stop.stop_id}
+                        position={[stop.lat, stop.lon]}
+                        icon={new Icon({
+                            iconUrl: "/leaflet/marker-icon.png",
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                        })}
+                    >
+                        {/* Tooltip: quick summary of lines */}
+                        <Tooltip permanent direction="top" offset={[0, -10]}>
+                            {stop.arrivals!.map((a) => a.line).join(", ")}
+                        </Tooltip>
 
-            {/* Popup: full details */}
-            <Popup>
-              <div className="text-sm font-medium">
-                <div className="font-semibold mb-1">{stop.stop_name}</div>
-                <ul className="list-disc ml-4">
-                  {stop.arrivals!.map((arr, idx) => (
-                    <li key={idx}>
-                      {arr.line} {arr.destination} - {arr.arrivalTimeInMinutes} min
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-    </MapContainer>
-  );
+                        {/* Popup: full details */}
+                        <Popup className="popupContainer">
+                            <div className="overflow-hidden rounded-lg shadow-lg">
+                                {/* Header */}
+                                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-3">
+                                    <div className="font-semibold text-white text-base">
+                                        {stop.stop_name}
+                                    </div>
+                                </div>
+
+                                {/* Routes List */}
+                                <div className="bg-white">
+                                    {stop.arrivals!.map((arr, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+                                        >
+                                            {/* Line Badge */}
+                                            <div className="bg-indigo-100 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-md min-w-[45px] text-center border-2 border-indigo-200">
+                                                {arr.line}
+                                            </div>
+
+                                            {/* Destination */}
+                                            <div className="flex-1 text-sm text-gray-700 font-medium">
+                                                {arr.destination}
+                                            </div>
+
+                                            {/* Time */}
+                                            <div className="text-sm font-bold text-indigo-600 whitespace-nowrap">
+                                                {arr.arrivalTimeInMinutes} min
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </Popup>
+                    </Marker>
+                ))}
+        </MapContainer>
+    );
 }

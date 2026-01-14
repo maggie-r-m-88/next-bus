@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --brand-blue: #003DF6;
+  --brand-dark-blue: #0032A0;
 }
 
 @theme inline {
@@ -10,6 +13,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --brand-blue: var(--brand-blue);
+  --brand-dark-blue: var(--brand-dark-blue);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +28,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.popupContainer .leaflet-popup-content{
+  margin: 0;
+}
+
+.leaflet-container .popupContainer a.leaflet-popup-close-button{
+  color: #fff;
+  font-weight: bold;
 }

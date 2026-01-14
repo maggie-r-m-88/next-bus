@@ -11,7 +11,7 @@ const DynamicMap = dynamic(() => import("./components/Map"), {
   ssr: false,
 });
 
-const RADIUS_METERS = 300;
+const RADIUS_METERS = 100;
 
 // Haversine formula (meters)
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -24,8 +24,8 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
@@ -41,20 +41,20 @@ export default function Home() {
   /* -------------------------------------------------------
    0. Authenticate with EMT on page load (warm token)
 ------------------------------------------------------- */
-useEffect(() => {
-  const authenticate = async () => {
-    try {
-      const res = await fetch("/api/emt/auth");
-      if (!res.ok) {
-        console.warn("EMT auth failed on page load");
+  useEffect(() => {
+    const authenticate = async () => {
+      try {
+        const res = await fetch("/api/emt/auth");
+        if (!res.ok) {
+          console.warn("EMT auth failed on page load");
+        }
+      } catch (err) {
+        console.warn("EMT auth error:", err);
       }
-    } catch (err) {
-      console.warn("EMT auth error:", err);
-    }
-  };
+    };
 
-  authenticate();
-}, []);
+    authenticate();
+  }, []);
 
   /* -------------------------------------------------------
      1. Compute nearby stops (PURE, synchronous)
@@ -138,14 +138,14 @@ useEffect(() => {
       <main className="w-full md:max-w-6xl flex flex-col gap-6 py-8 md:px-6 bg-white dark:bg-black rounded-lg shadow-lg">
         {/* Header */}
         <div className="flex w-full justify-between items-center px-2 md:px-6 mt-4">
-          <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">
+          <h1 className="text-3xl font-semibold text-black dark:text-zinc-50">
             NEXT BUS
           </h1>
 
           <button
             onClick={handleUseMyLocation}
             disabled={loading}
-            className="flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-white text-md md:text-lg shadow-sm hover:bg-blue-700 font-semibold disabled:opacity-60"
+            className="flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-blue-700 font-semibold disabled:opacity-60"
           >
             {loading ? "Loading…" : "Find Nearby Stops"}
           </button>
@@ -157,21 +157,19 @@ useEffect(() => {
         <div className="flex mt-4 border-b border-gray-300 px-2 md:px-6">
           <button
             onClick={() => setActiveTab("map")}
-            className={`px-4 py-2 -mb-px font-medium ${
-              activeTab === "map"
+            className={`px-4 py-2 -mb-px font-medium ${activeTab === "map"
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "text-gray-500"
-            }`}
+              }`}
           >
             Map
           </button>
           <button
             onClick={() => setActiveTab("stops")}
-            className={`px-4 py-2 -mb-px font-medium ${
-              activeTab === "stops"
+            className={`px-4 py-2 -mb-px font-medium ${activeTab === "stops"
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "text-gray-500"
-            }`}
+              }`}
           >
             List
           </button>
@@ -185,16 +183,16 @@ useEffect(() => {
         )}
 
         {coords && activeTab === "stops" && (
-  <div className="w-full px-2 md:px-6">
-    {loading ? (
-      <p className="text-gray-500">Loading arrivals…</p>
-    ) : stopsWithArrivals.length === 0 ? (
-      <p className="text-gray-500">No nearby stops found.</p>
-    ) : (
-      <NearbyStops stops={stopsWithArrivals} />
-    )}
-  </div>
-)}
+          <div className="w-full px-2 md:px-6">
+            {loading ? (
+              <p className="text-gray-500">Loading arrivals…</p>
+            ) : stopsWithArrivals.length === 0 ? (
+              <p className="text-gray-500">No nearby stops found.</p>
+            ) : (
+              <NearbyStops stops={stopsWithArrivals} />
+            )}
+          </div>
+        )}
 
       </main>
     </div>
