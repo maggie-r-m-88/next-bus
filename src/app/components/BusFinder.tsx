@@ -136,9 +136,9 @@ export default function BusFinder() {
     };
 
     return (
-        <div className="flex flex-col flex-1 overflow-hidden">
-            {/* Sticky Tabs & Button */}
-            <div className="sticky top-0 z-40 bg-white dark:bg-black px-2 md:px-6 border-b border-gray-200">
+        <div className="flex flex-col flex-1">
+            {/* Fixed Tabs & Button - not sticky, just fixed position */}
+            <div className=" sticky top-0 flex-shrink-0 bg-white dark:bg-black px-2 md:px-6 border-b border-gray-200 z-40">
                 <div className="flex items-center justify-between py-2">
                     {/* Left: Tabs */}
                     <div className="flex gap-2">
@@ -181,8 +181,8 @@ export default function BusFinder() {
                 </div>
             </div>
 
-            {/* Content area - Map should NOT scroll, List should */}
-            <div className="flex-1 overflow-hidden">
+            {/* Content area - takes remaining space */}
+            <div className="flex-1 min-h-0">
                 {coords && activeTab === "map" && (
                     <div className="h-full w-full">
                         <DynamicMap
