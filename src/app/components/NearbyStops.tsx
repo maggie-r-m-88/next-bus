@@ -8,34 +8,31 @@ interface NearbyStopsProps {
 }
 
 export default function NearbyStops({ stops }: NearbyStopsProps) {
-  const [openStops, setOpenStops] = useState<Set<number>>(new Set());
+  const [openStops, setOpenStops] = useState<Set<string>>(new Set());
 
-  // Open all stops by default when data loads
-  useEffect(() => {
-    setOpenStops(new Set(stops.map((s) => s.stop_id)));
-  }, [stops]);
+useEffect(() => {
+  setOpenStops(new Set(stops.map((s) => s.stop_id)));
+}, [stops]);
 
-  const toggleStop = (stopId: number) => {
-    setOpenStops((prev) => {
-      const next = new Set(prev);
-      next.has(stopId) ? next.delete(stopId) : next.add(stopId);
-      return next;
-    });
-  };
+const toggleStop = (stopId: string) => {
+  setOpenStops((prev) => {
+    const next = new Set(prev);
+    next.has(stopId) ? next.delete(stopId) : next.add(stopId);
+    return next;
+  });
+};
 
   return (
     <div className="space-y-4">
       {stops.map((stop) => {
         const isOpen = openStops.has(stop.stop_id);
-
         return (
           <div
             key={stop.stop_id}
             className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
           >
             {/* Header */}
-            <button
-              onClick={() => toggleStop(stop.stop_id)}
+            <button onClick={() => toggleStop(stop.stop_id)}
               className="w-full flex items-center justify-between bg-gradient-to-r from-[var(--brand-dark-blue)] to-indigo-500 px-3 py-2 text-left"
             >
               <h3 className="font-semibold text-white text-base">

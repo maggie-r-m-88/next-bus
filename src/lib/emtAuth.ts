@@ -27,5 +27,9 @@ export async function getEmtAccessToken(): Promise<string> {
   accessToken = data.data[0].accessToken;
   tokenExpiresAt = Date.now() + data.data[0].tokenSecExpiration * 1000;
 
+  if (!accessToken) {
+    throw new Error("EMT API did not return an access token");
+  }
+
   return accessToken;
 }

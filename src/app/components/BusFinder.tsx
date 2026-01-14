@@ -181,7 +181,16 @@ export default function BusFinder() {
             {/* Map */}
             {coords && activeTab === "map" && (
                 <div className="w-full h-full">
-                    <DynamicMap userPosition={[coords.lat, coords.lon]} stops={stopsWithArrivals} />
+                   <DynamicMap
+  userPosition={[coords.lat, coords.lon]}
+  stops={stopsWithArrivals.map(s => ({
+    ...s,
+    stop_id: Number(s.stop_id), // convert string to number
+    lat: s.lat,
+    lon: s.lon,
+  }))}
+/>
+
                 </div>
             )}
 
