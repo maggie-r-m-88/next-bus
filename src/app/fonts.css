@@ -1,0 +1,20 @@
+@font-face {
+  font-family: 'Chulapa';
+  src: url('/fonts/Chulapa-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Chulapa';
+  src: url('/fonts/Chulapa-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Chulapa';
+  src: url('/fonts/Chulapa-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}

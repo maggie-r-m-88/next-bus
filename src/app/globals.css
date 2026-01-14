@@ -1,11 +1,12 @@
 @import "tailwindcss";
-
+@import "./fonts.css";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
   --brand-blue: #003DF6;
   --brand-dark-blue: #0032A0;
+  --font-chulapa: 'Chulapa', sans-serif;
 }
 
 @theme inline {
@@ -15,6 +16,7 @@
   --font-mono: var(--font-geist-mono);
   --brand-blue: var(--brand-blue);
   --brand-dark-blue: var(--brand-dark-blue);
+  --font-chulapa: var(--font-chulapa);
 }
 
 @media (prefers-color-scheme: dark) {
