@@ -136,9 +136,9 @@ export default function BusFinder() {
     };
 
     return (
-       <div className="flex flex-col flex-1 overflow-y-auto">
-  {/* Tabs + Button (sticky) */}
-  <div className="sticky top-0 z-40 bg-white dark:bg-black border-b border-gray-200 px-4 py-2">
+       <div className="flex flex-col flex-1 min-h-0">
+  {/* Tabs + Button - Fixed, not sticky */}
+  <div className="flex-shrink-0 z-40 bg-white dark:bg-black border-b border-gray-200 px-4 py-2">
     <div className="flex items-center justify-between py-2">
       {/* Left tabs */}
       <div className="flex gap-2">
@@ -183,32 +183,34 @@ export default function BusFinder() {
     </div>
   </div>
 
-  {/* Content area */}
-  {coords && activeTab === "map" && (
-    <div className="w-full" style={{ height: "calc(100vh - 180px)" }}>
-      <DynamicMap
-        userPosition={[coords.lat, coords.lon]}
-        stops={stopsWithArrivals.map((s) => ({
-          ...s,
-          stop_id: Number(s.stop_id),
-          lat: s.lat,
-          lon: s.lon,
-        }))}
-      />
-    </div>
-  )}
+  {/* Content area - flex-1 takes remaining space */}
+  <div className="flex-1 min-h-0">
+    {coords && activeTab === "map" && (
+      <div className="w-full h-full">
+        <DynamicMap
+          userPosition={[coords.lat, coords.lon]}
+          stops={stopsWithArrivals.map((s) => ({
+            ...s,
+            stop_id: Number(s.stop_id),
+            lat: s.lat,
+            lon: s.lon,
+          }))}
+        />
+      </div>
+    )}
 
-  {coords && activeTab === "stops" && (
-    <div className="w-full px-3 md:px-8 bg-[#ecf1f7] py-3 md:py-8">
-      {loading ? (
-        <p className="text-gray-500">Loading arrivals…</p>
-      ) : stopsWithArrivals.length === 0 ? (
-        <p className="text-gray-500">No nearby stops found.</p>
-      ) : (
-        <NearbyStops stops={stopsWithArrivals} />
-      )}
-    </div>
-  )}
+    {coords && activeTab === "stops" && (
+      <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] py-3 md:py-8">
+        {loading ? (
+          <p className="text-gray-500">Loading arrivals…</p>
+        ) : stopsWithArrivals.length === 0 ? (
+          <p className="text-gray-500">No nearby stops found.</p>
+        ) : (
+          <NearbyStops stops={stopsWithArrivals} />
+        )}
+      </div>
+    )}
+  </div>
 </div>
 
 
