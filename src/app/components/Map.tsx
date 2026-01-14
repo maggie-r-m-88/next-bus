@@ -24,7 +24,7 @@ interface MapProps {
   stops?: Stop[]; // optional, can override static stopsData
 }
 
-export default function MyMap({ userPosition, stops }: MapProps) {
+export default function DynamicMap({ userPosition, stops }: MapProps) {
   const stopsToUse = stops || [];
 
   return (
@@ -32,7 +32,7 @@ export default function MyMap({ userPosition, stops }: MapProps) {
       center={userPosition}
       zoom={20}
       scrollWheelZoom={true}
-      className="w-full h-[100vh] rounded-lg shadow-md"
+      className="w-full h-[90vh] rounded-lg shadow-md"
       style={{ height: "100vh", width: "100%" }}
     >
       <TileLayer
