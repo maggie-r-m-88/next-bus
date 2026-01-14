@@ -183,10 +183,10 @@ export default function BusFinder() {
     </div>
   </div>
 
-  {/* Scrollable content below tabs */}
-  <div className="flex-1 overflow-y-auto">
+  {/* Content area - different overflow for map vs list */}
+  <div className={`flex-1 ${activeTab === "stops" ? "overflow-y-auto" : "overflow-hidden"}`}>
     {coords && activeTab === "map" && (
-      <div className="h-full w-full">
+      <div className="h-full w-full touch-none">
         <DynamicMap
           userPosition={[coords.lat, coords.lon]}
           stops={stopsWithArrivals.map((s) => ({
