@@ -186,7 +186,7 @@ export default function BusFinder() {
   {/* Content area - flex-1 takes remaining space */}
   <div className="flex-1 min-h-0">
     {coords && activeTab === "map" && (
-      <div className="w-full h-full">
+      <div className="w-full h-[600px]">
         <DynamicMap
           userPosition={[coords.lat, coords.lon]}
           stops={stopsWithArrivals.map((s) => ({
