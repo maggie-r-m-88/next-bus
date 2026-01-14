@@ -58,8 +58,9 @@ export default function MyMap({ userPosition, stops }: MapProps) {
           >
             {/* Tooltip: quick summary of lines */}
             <Tooltip permanent direction="top" offset={[0, -10]} className="tooltipContainer">
-              {stop.arrivals!.map((a) => a.line).join(", ")}
+                {Array.from(new Set(stop.arrivals!.map((a) => a.line))).join(", ")}
             </Tooltip>
+
 
             {/* Popup: full details */}
             <Popup className="popupContainer">

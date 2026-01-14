@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import stops from "@/resources/madrid_emt_stops.json";
-import type { Stop, NormalizedStop } from "@/types/stop";
+import type { NormalizedStop } from "@/types/stop";
 import NearbyStops from "./components/NearbyStops";
 
 const DynamicMap = dynamic(() => import("./components/Map"), {
@@ -11,7 +11,7 @@ const DynamicMap = dynamic(() => import("./components/Map"), {
   ssr: false,
 });
 
-const RADIUS_METERS = 200;
+const RADIUS_METERS = 100;
 
 // Haversine formula (meters)
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -57,6 +57,34 @@ export default function Home() {
   }, []);
 
   /* -------------------------------------------------------
+   0.5. Auto-fetch location on page load
+------------------------------------------------------- */
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+        });
+        setLoading(false);
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        setError("Unable to retrieve your location. Please click the button to try again.");
+        setLoading(false);
+      },
+      { enableHighAccuracy: true }
+    );
+  }, []); // Run once on mount
+
+  /* -------------------------------------------------------
      1. Compute nearby stops (PURE, synchronous)
   ------------------------------------------------------- */
   const nearbyStops = useMemo(() => {
@@ -75,7 +103,14 @@ export default function Home() {
      2. Fetch arrivals AFTER nearbyStops exists
   ------------------------------------------------------- */
   useEffect(() => {
-    if (nearbyStops.length === 0) return;
+    if (nearbyStops.length === 0) {
+      // If coords exist but no nearby stops, stop loading
+      if (coords) {
+        setLoading(false);
+        setStopsWithArrivals([]);
+      }
+      return;
+    }
 
     const fetchArrivals = async () => {
       try {
@@ -105,10 +140,10 @@ export default function Home() {
     };
 
     fetchArrivals();
-  }, [nearbyStops]);
+  }, [nearbyStops, coords]);
 
   /* -------------------------------------------------------
-     3. Button handler = LOCATION ONLY
+     3. Button handler = RESET & REFETCH
   ------------------------------------------------------- */
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
@@ -116,8 +151,11 @@ export default function Home() {
       return;
     }
 
+    // Reset everything except auth token
     setError("");
     setLoading(true);
+    setStopsWithArrivals([]);
+    setCoords(null);
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -125,11 +163,13 @@ export default function Home() {
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
         });
+        // Don't set loading to false here - let the arrivals fetch do it
       },
       () => {
         setError("Unable to retrieve your location");
         setLoading(false);
-      }
+      },
+      { enableHighAccuracy: true }
     );
   };
 
@@ -142,48 +182,65 @@ export default function Home() {
             NEXT BUS
           </h1>
 
-          <button
-            onClick={handleUseMyLocation}
-            disabled={loading}
-            className="flex items-center gap-2 rounded-full bg-[var(--brand-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-indigo-500 font-semibold disabled:opacity-60"
-          >
-            {loading ? "Loading…" : "Find Nearby Stops"}
-          </button>
+
         </div>
 
         {error && <p className="text-red-600 px-6">{error}</p>}
 
-        {/* Tabs */}
-        <div className="flex mt-4 border-b border-gray-300 px-2 md:px-6">
+        {/* Tabs + Button row */}
+        <div className="flex items-center justify-between mt-4 md:pb-4 border-b border-gray-300  px-2">
+          {/* Tabs */}
+          <div className="flex">
+            <button
+              onClick={() => setActiveTab("map")}
+              className={`px-4 py-2 -mb-px font-medium ${activeTab === "map"
+                  ? "border-b-3 border-[var(--brand-blue)] text-blue-600 font-semibold"
+                  : "text-gray-500"
+                }`}
+            >
+              Map
+            </button>
+            <button
+              onClick={() => setActiveTab("stops")}
+              className={`px-4 py-2 -mb-px font-medium ${activeTab === "stops"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500"
+                }`}
+            >
+              List
+            </button>
+          </div>
+
+          {/* Flush right button */}
           <button
-            onClick={() => setActiveTab("map")}
-            className={`px-4 py-2 -mb-px font-medium ${activeTab === "map"
-                ? "border-b-2 border-blue-600 text-blue-600"
-                : "text-gray-500"
-              }`}
+            onClick={handleUseMyLocation}
+            disabled={loading}
+            className="flex items-center gap-2 rounded-full bg-[var(--brand-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-indigo-500 font-semibold disabled:opacity-60 mb-2"
           >
-            Map
-          </button>
-          <button
-            onClick={() => setActiveTab("stops")}
-            className={`px-4 py-2 -mb-px font-medium ${activeTab === "stops"
-                ? "border-b-2 border-blue-600 text-blue-600"
-                : "text-gray-500"
-              }`}
-          >
-            List
+            {/* Pin icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z" />
+            </svg>
+
+            {loading ? "Loading…" : "Buses Near Me"}
           </button>
         </div>
 
+
         {/* Content */}
         {coords && activeTab === "map" && (
-        <div className="w-full h-full">
-          <DynamicMap 
-            userPosition={[coords.lat, coords.lon]} 
-            stops={stopsWithArrivals} // <-- pass fetched stops here
-          />
-        </div>
-      )}
+          <div className="w-full h-full">
+            <DynamicMap
+              userPosition={[coords.lat, coords.lon]}
+              stops={stopsWithArrivals} // <-- pass fetched stops here
+            />
+          </div>
+        )}
 
 
         {coords && activeTab === "stops" && (
