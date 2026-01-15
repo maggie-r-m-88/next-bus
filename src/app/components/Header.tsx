@@ -1,17 +1,21 @@
 export default function Header() {
-
-    return (
-        <div className="flex-shrink-0 px-2 md:px-6 py-4 z-50 touch-none">
-
-            <h1
-                className="text-4xl text-black dark:text-zinc-50 text-center flex justify-center tracking-tighter font-bold"
-                style={{ fontFamily: "Stack Sans Notch, sans-serif" }}
-            >
-                EMT Near Me
-            </h1>
-            <h2 className="text-center tracking-widest text-md" style={{ fontFamily: "Chulapa, sans-serif" }}>Madrid bus arrivals</h2>
-
-
-        </div>
-    );
+  return (
+    <div className="flex-shrink-0 px-2 py-3 z-50 touch-none">
+      {/* Wrap the logo/text in a block div that fits its content */}
+      <div className="inline-block">
+        <h1
+          className="text-4xl tracking-tighter font-light"
+          style={{ fontFamily: "Stack Sans Notch, sans-serif" }}
+        >
+          <span class="font-extrabold">EMT</span> Near Me
+        </h1>
+        <h2
+          className="tracking-widest text-base text-center"
+          style={{ fontFamily: "Chulapa, sans-serif" }}
+        >
+          Madrid bus arrivals
+        </h2>
+      </div>
+    </div>
+  );
 }

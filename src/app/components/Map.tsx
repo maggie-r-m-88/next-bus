@@ -32,7 +32,7 @@ export default function DynamicMap({ userPosition, stops }: MapProps) {
       center={userPosition}
       zoom={20}
       scrollWheelZoom={true}
-      className="w-full h-full rounded-lg"
+      className="w-full h-full md:rounded-lg"
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
