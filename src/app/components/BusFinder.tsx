@@ -179,7 +179,7 @@ export default function BusFinder() {
 
         <div className="flex flex-col flex-1 min-h-0">
             {/* Tabs + Button - Fixed, not sticky */}
-            <div className="flex-shrink-0 z-40 bg-white dark:bg-[#111827] px-2 md:px-0 py-2 touch-none">
+            <div className="flex-shrink-0 z-40 px-2 md:px-0 py-2 touch-none">
                 <div className="flex items-center justify-between py-2">
                     {/* Left tabs */}
                     <div className="flex gap-2">
@@ -198,7 +198,7 @@ export default function BusFinder() {
                             onClick={() => setActiveTab("stops")}
                             className={`flex items-center gap-2 px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "stops"
                                     ? "border-b-3 border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold"
-                                    : "text-gray-500"
+                                    : "text-gray-500 dark:text-gray-400"
                                 }`}
                         >
                             <ListIcon className="h-5 w-5" />
@@ -243,7 +243,7 @@ export default function BusFinder() {
                 )}
 
                 {coords && activeTab === "stops" && (
-                    <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] py-3 md:py-8">
+                    <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] dark:bg-[#020024] py-3 md:py-8 rounded-lg">
                         {loading ? (
                             <p className="text-gray-500">Loading arrivals…</p>
                         ) : stopsWithArrivals.length === 0 ? (

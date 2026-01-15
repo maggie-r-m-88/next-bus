@@ -3,8 +3,8 @@ import BusFinder from "./components/BusFinder";
 
 export default function Home() {
   return (
-    <div className="flex h-screen justify-center bg-zinc-50 dark:bg-[#111827] overflow-hidden">
-     <main className="w-full md:max-w-6xl flex flex-col md:px-6 bg-white dark:bg-[#111827] rounded-lg shadow-lg h-full overflow-hidden">
+    <div className="flex h-screen justify-center overflow-hidden">
+     <main className="w-full md:max-w-6xl flex flex-col md:px-6 rounded-lgh-full overflow-hidden">
         {/* Header */}
         <Header />
 

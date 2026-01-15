@@ -29,7 +29,7 @@ const toggleStop = (stopId: string) => {
         return (
           <div
             key={stop.stop_id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+            className="bg-white rounded-lg shadow-sm overflow-hidden"
           >
             {/* Header */}
             <button onClick={() => toggleStop(stop.stop_id)}
