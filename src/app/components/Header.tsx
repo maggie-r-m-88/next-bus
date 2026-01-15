@@ -7,7 +7,7 @@ export default function Header() {
           className="text-4xl tracking-tighter font-light"
           style={{ fontFamily: "Stack Sans Notch, sans-serif" }}
         >
-          <span class="font-extrabold">EMT</span> Near Me
+          <span className="font-extrabold">EMT</span> Near Me
         </h1>
         <h2
           className="tracking-widest text-base text-center"

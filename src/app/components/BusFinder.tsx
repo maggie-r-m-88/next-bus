@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import stops from "@/resources/madrid_emt_stops.json";
 import type { NormalizedStop } from "@/types/stop";
 import NearbyStops from "./NearbyStops";
+import OutOfArea from "./OutOfArea";
 
 const DynamicMap = dynamic(() => import("./Map"), {
     loading: () => <p>Loading map...</p>,
@@ -12,6 +13,11 @@ const DynamicMap = dynamic(() => import("./Map"), {
 });
 
 const RADIUS_METERS = 200;
+
+// TEST MODE - Set to true to use static coordinates
+const IS_TEST_MODE = true;
+// Test coordinates (Madrid city center - Puerta del Sol)
+const TEST_COORDS = { lat: 33.75, lon: 84.3 };
 
 // Haversine formula
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -31,7 +37,9 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export default function BusFinder() {
-    const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+    const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
+        IS_TEST_MODE ? TEST_COORDS : null
+    );
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState<"map" | "stops">("map");
@@ -49,8 +57,13 @@ export default function BusFinder() {
         authenticate();
     }, []);
 
-    // Auto-fetch location on mount
+    // Auto-fetch location on mount (skip in test mode)
     useEffect(() => {
+        if (IS_TEST_MODE) {
+            console.log("🧪 Test mode enabled - using static coordinates:", TEST_COORDS);
+            return; // Exit early - coords already set in initial state
+        }
+
         if (!navigator.geolocation) {
             setError("Geolocation not supported");
             return;
@@ -73,24 +86,41 @@ export default function BusFinder() {
     // Nearby stops
     const nearbyStops = useMemo(() => {
         if (!coords) return [];
-        return stops
-            .map((s) => ({
-                ...s,
-                distance: getDistance(coords.lat, coords.lon, s.stop_lat, s.stop_lon),
-            }))
-            .filter((s) => s.distance! <= RADIUS_METERS)
-            .sort((a, b) => a.distance! - b.distance!);
+
+        const stopsWithDistance = stops.map((s) => ({
+            ...s,
+            distance: getDistance(coords.lat, coords.lon, s.stop_lat, s.stop_lon),
+        }));
+
+        const filtered = stopsWithDistance.filter((s) => s.distance! <= RADIUS_METERS);
+
+        if (IS_TEST_MODE) {
+            console.log(`🧪 Test mode: Found ${filtered.length} stops within ${RADIUS_METERS}m of`, coords);
+            if (filtered.length === 0) {
+                console.log("🧪 No stops found - this is expected for non-Madrid coordinates");
+            }
+        }
+
+        return filtered.sort((a, b) => a.distance! - b.distance!);
     }, [coords]);
 
     // Fetch arrivals
     useEffect(() => {
         if (nearbyStops.length === 0) {
-            if (coords) setStopsWithArrivals([]);
+            if (coords) {
+                if (IS_TEST_MODE) {
+                    console.log("🧪 Test mode: No nearby stops, clearing arrivals");
+                }
+                setStopsWithArrivals([]);
+            }
             return;
         }
 
         const fetchArrivals = async () => {
             try {
+                if (IS_TEST_MODE) {
+                    console.log(`🧪 Test mode: Fetching arrivals for ${nearbyStops.length} stops`);
+                }
                 setLoading(true);
                 const res = await fetch("/api/emt/arrivals", {
                     method: "POST",
@@ -101,6 +131,9 @@ export default function BusFinder() {
                 if (!res.ok) throw new Error("Failed to fetch arrivals");
 
                 const data: NormalizedStop[] = await res.json();
+                if (IS_TEST_MODE) {
+                    console.log(`🧪 Test mode: Received ${data.length} stops with arrivals`);
+                }
                 setStopsWithArrivals(data);
             } catch (err) {
                 console.error(err);
@@ -115,6 +148,17 @@ export default function BusFinder() {
 
     // Refetch location
     const handleUseMyLocation = () => {
+        if (IS_TEST_MODE) {
+            console.log("🧪 Test mode - refreshing with static coordinates");
+            setStopsWithArrivals([]);
+            // Force re-render by setting to null first, then to test coords
+            setCoords(null);
+            setTimeout(() => {
+                setCoords(TEST_COORDS);
+            }, 0);
+            return;
+        }
+
         if (!navigator.geolocation) {
             setError("Geolocation not supported");
             return;
@@ -174,84 +218,95 @@ export default function BusFinder() {
     );
 
 
+    // Check if user is out of area (no nearby stops and coords are set)
+    const isOutOfArea = coords && nearbyStops.length === 0 && !loading;
+
     return (
 
 
         <div className="flex flex-col flex-1 min-h-0">
-            {/* Tabs + Button - Fixed, not sticky */}
-            <div className="flex-shrink-0 z-40 px-2 md:px-0 py-2 touch-none">
-                <div className="flex items-center justify-between py-2">
-                    {/* Left tabs */}
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setActiveTab("map")}
-                            className={`flex items-center gap-2 px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "map"
-                                    ? "border-b-3 border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold"
-                                    : "text-gray-500 dark:text-gray-400"
-                                }`}
-                        >
-                            <MapIcon className="h-5 w-5" />
-                            <span>Map</span>
-                        </button>
+            {/* Tabs + Button - Only show if in area */}
+            {!isOutOfArea && (
+                <div className="flex-shrink-0 z-40 px-2 md:px-0 py-2 touch-none">
+                    <div className="flex items-center justify-between py-2">
+                        {/* Left tabs */}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setActiveTab("map")}
+                                className={`flex items-center gap-2 px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "map"
+                                        ? "border-b-3 border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold"
+                                        : "text-gray-500 dark:text-gray-400"
+                                    }`}
+                            >
+                                <MapIcon className="h-5 w-5" />
+                                <span>Map</span>
+                            </button>
 
-                        <button
-                            onClick={() => setActiveTab("stops")}
-                            className={`flex items-center gap-2 px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "stops"
-                                    ? "border-b-3 border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold"
-                                    : "text-gray-500 dark:text-gray-400"
-                                }`}
-                        >
-                            <ListIcon className="h-5 w-5" />
-                            <span>List</span>
-                        </button>
+                            <button
+                                onClick={() => setActiveTab("stops")}
+                                className={`flex items-center gap-2 px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "stops"
+                                        ? "border-b-3 border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold"
+                                        : "text-gray-500 dark:text-gray-400"
+                                    }`}
+                            >
+                                <ListIcon className="h-5 w-5" />
+                                <span>List</span>
+                            </button>
 
+                        </div>
+
+                        {/* Right button */}
+                        <button
+                            onClick={handleUseMyLocation}
+                            disabled={loading}
+                            className="flex items-center gap-2 rounded-md bg-[var(--brand-dark-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-[#3F425D] font-semibold disabled:opacity-60"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z" />
+                            </svg>
+                            {loading ? "Loading…" : IS_TEST_MODE ? "🧪 Test" : "Search"}
+                        </button>
                     </div>
-
-                    {/* Right button */}
-                    <button
-                        onClick={handleUseMyLocation}
-                        disabled={loading}
-                        className="flex items-center gap-2 rounded-md bg-[var(--brand-dark-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-[#3F425D] font-semibold disabled:opacity-60"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z" />
-                        </svg>
-                        {loading ? "Loading…" : "Search"}
-                    </button>
                 </div>
-            </div>
+            )}
 
             {/* Content area - flex-1 takes remaining space */}
             <div className="flex-1 min-h-0">
-                {coords && activeTab === "map" && (
-                    <div className="w-full h-[600px]">
-                        <DynamicMap
-                            userPosition={[coords.lat, coords.lon]}
-                            stops={stopsWithArrivals.map((s) => ({
-                                ...s,
-                                stop_id: Number(s.stop_id),
-                                lat: s.lat,
-                                lon: s.lon,
-                            }))}
-                        />
-                    </div>
-                )}
-
-                {coords && activeTab === "stops" && (
-                    <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] dark:bg-[#020024] py-3 md:py-8 rounded-lg">
-                        {loading ? (
-                            <p className="text-gray-500">Loading arrivals…</p>
-                        ) : stopsWithArrivals.length === 0 ? (
-                            <p className="text-gray-500">No nearby stops found.</p>
-                        ) : (
-                            <NearbyStops stops={stopsWithArrivals} />
+                {isOutOfArea ? (
+                    <OutOfArea onRetry={handleUseMyLocation} isTestMode={IS_TEST_MODE} />
+                ) : (
+                    <>
+                        {coords && activeTab === "map" && (
+                            <div className="w-full h-[600px]">
+                                <DynamicMap
+                                    userPosition={[coords.lat, coords.lon]}
+                                    stops={stopsWithArrivals.map((s) => ({
+                                        ...s,
+                                        stop_id: Number(s.stop_id),
+                                        lat: s.lat,
+                                        lon: s.lon,
+                                    }))}
+                                />
+                            </div>
                         )}
-                    </div>
+
+                        {coords && activeTab === "stops" && (
+                            <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] dark:bg-[#020024] py-3 md:py-8 rounded-lg">
+                                {loading ? (
+                                    <p className="text-gray-500">Loading arrivals…</p>
+                                ) : stopsWithArrivals.length === 0 ? (
+                                    <p className="text-gray-500">No nearby stops found.</p>
+                                ) : (
+                                    <NearbyStops stops={stopsWithArrivals} />
+                                )}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
