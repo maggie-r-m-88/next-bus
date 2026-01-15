@@ -12,8 +12,6 @@ const DynamicMap = dynamic(() => import("./Map"), {
     ssr: false,
 });
 
-const RADIUS_METERS = 200;
-
 // TEST MODE - Set to true to use static coordinates
 const IS_TEST_MODE = false;
 // Test coordinates (Madrid city center - Puerta del Sol)
@@ -36,7 +34,11 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-export default function BusFinder() {
+interface BusFinderProps {
+    radiusMeters: number;
+}
+
+export default function BusFinder({ radiusMeters }: BusFinderProps) {
     const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
         IS_TEST_MODE ? TEST_COORDS : null
     );
@@ -92,17 +94,17 @@ export default function BusFinder() {
             distance: getDistance(coords.lat, coords.lon, s.stop_lat, s.stop_lon),
         }));
 
-        const filtered = stopsWithDistance.filter((s) => s.distance! <= RADIUS_METERS);
+        const filtered = stopsWithDistance.filter((s) => s.distance! <= radiusMeters);
 
         if (IS_TEST_MODE) {
-            console.log(`🧪 Test mode: Found ${filtered.length} stops within ${RADIUS_METERS}m of`, coords);
+            console.log(`🧪 Test mode: Found ${filtered.length} stops within ${radiusMeters}m of`, coords);
             if (filtered.length === 0) {
                 console.log("🧪 No stops found - this is expected for non-Madrid coordinates");
             }
         }
 
         return filtered.sort((a, b) => a.distance! - b.distance!);
-    }, [coords]);
+    }, [coords, radiusMeters]);
 
     // Fetch arrivals
     useEffect(() => {
@@ -296,7 +298,7 @@ export default function BusFinder() {
                         )}
 
                         {coords && activeTab === "stops" && (
-                            <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] dark:bg-[#020024] py-3 md:py-8 rounded-lg">
+                            <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7] dark:bg-[#020024] py-3 md:py-8 md:rounded-lg">
                                 {loading ? (
                                     <p className="text-gray-500">Loading arrivals…</p>
                                 ) : stopsWithArrivals.length === 0 ? (
