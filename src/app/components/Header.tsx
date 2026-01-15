@@ -1,7 +1,7 @@
 export default function Header() {
 
     return (
-        <div className="flex-shrink-0 bg-white dark:bg-[#111827] px-2 md:px-6 py-4 z-50 touch-none">
+        <div className="flex-shrink-0 px-2 md:px-6 py-4 z-50 touch-none">
 
             <h1
                 className="text-4xl text-black dark:text-zinc-50 text-center flex justify-center tracking-tighter font-bold"
