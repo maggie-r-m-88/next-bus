@@ -15,7 +15,7 @@ const DynamicMap = dynamic(() => import("./Map"), {
 const RADIUS_METERS = 200;
 
 // TEST MODE - Set to true to use static coordinates
-const IS_TEST_MODE = true;
+const IS_TEST_MODE = false;
 // Test coordinates (Madrid city center - Puerta del Sol)
 const TEST_COORDS = { lat: 33.75, lon: 84.3 };
 
