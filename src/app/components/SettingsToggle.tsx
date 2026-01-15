@@ -43,7 +43,7 @@ export default function SettingsToggleButton({ open, setOpen }: SettingsToggleBu
       onMouseLeave={() => setPressed(false)}
       aria-label={open ? "Close settings" : "Open settings"}
       className={`
-        w-5 h-5 md:w-6 md:h-6 flex items-center justify-center
+        w-6 h-6 flex items-center justify-center
         transition-transform duration-150 cursor-pointer
         ${pressed ? "scale-90 rotate-3" : "scale-100 rotate-0"}
       `}
