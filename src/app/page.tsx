@@ -28,7 +28,10 @@ export default function Home() {
         {showSettings ? (
           <Settings radiusMeters={radiusMeters} onApply={handleApplySettings} />
         ) : (
-          <BusFinder radiusMeters={radiusMeters} />
+          <BusFinder
+            radiusMeters={radiusMeters}
+            onOpenSettings={() => setShowSettings(true)}
+          />
         )}
       </main>
     </div>

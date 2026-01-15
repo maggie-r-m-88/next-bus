@@ -36,9 +36,10 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
 
 interface BusFinderProps {
     radiusMeters: number;
+    onOpenSettings?: () => void;
 }
 
-export default function BusFinder({ radiusMeters }: BusFinderProps) {
+export default function BusFinder({ radiusMeters, onOpenSettings }: BusFinderProps) {
     const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
         IS_TEST_MODE ? TEST_COORDS : null
     );
@@ -137,6 +138,7 @@ export default function BusFinder({ radiusMeters }: BusFinderProps) {
                     console.log(`🧪 Test mode: Received ${data.length} stops with arrivals`);
                 }
                 setStopsWithArrivals(data);
+                console.log(data);
             } catch (err) {
                 console.error(err);
                 setError("Failed to fetch arrivals");
@@ -223,6 +225,9 @@ export default function BusFinder({ radiusMeters }: BusFinderProps) {
     // Check if user is out of area (no nearby stops and coords are set)
     const isOutOfArea = coords && nearbyStops.length === 0 && !loading;
 
+    // Check if there are any arrivals across all stops
+    const hasAnyArrivals = stopsWithArrivals.some(stop => stop.arrivals && stop.arrivals.length > 0);
+
     return (
 
 
@@ -280,31 +285,49 @@ export default function BusFinder({ radiusMeters }: BusFinderProps) {
             {/* Content area - flex-1 takes remaining space */}
             <div className="flex-1 min-h-0">
                 {isOutOfArea ? (
-                    <OutOfArea onRetry={handleUseMyLocation} isTestMode={IS_TEST_MODE} />
+                    <OutOfArea
+                        onRetry={handleUseMyLocation}
+                        isTestMode={IS_TEST_MODE}
+                        onGoToSettings={onOpenSettings}
+                    />
                 ) : (
                     <>
                         {coords && activeTab === "map" && (
-                            <div className="w-full h-[600px]">
-                                <DynamicMap
-                                    userPosition={[coords.lat, coords.lon]}
-                                    stops={stopsWithArrivals.map((s) => ({
-                                        ...s,
-                                        stop_id: Number(s.stop_id),
-                                        lat: s.lat,
-                                        lon: s.lon,
-                                    }))}
-                                />
-                            </div>
+                            <>
+                                {loading ? (
+                                    <div className="w-full h-full flex justify-center px-3 md:px-8 bg-[#ecf1f7]/70 dark:bg-[#020024]/70 py-3 md:py-8 md:rounded-lg">
+                                        <p className="text-gray-500 text-center text-lg">Loading arrivals…</p>
+                                    </div>
+                                ) : !hasAnyArrivals ? (
+                                    <div className="w-full h-full flex justify-center px-3 md:px-8 bg-[#ecf1f7]/70 dark:bg-[#020024]/70 py-3 md:py-8 md:rounded-lg">
+                                        <p className="text-gray-500 text-center text-lg">No arrivals found at nearby stops.</p>
+                                    </div>
+                                ) : (
+                                    <div className="w-full h-[600px]">
+                                        <DynamicMap
+                                            userPosition={[coords.lat, coords.lon]}
+                                            stops={stopsWithArrivals.map((s) => ({
+                                                ...s,
+                                                stop_id: Number(s.stop_id),
+                                                lat: s.lat,
+                                                lon: s.lon,
+                                            }))}
+                                        />
+                                    </div>
+                                )}
+                            </>
                         )}
 
                         {coords && activeTab === "stops" && (
-                            <div className="w-full h-full overflow-y-auto px-3 md:px-8 bg-[#ecf1f7]/70 dark:bg-[#020024]/70 py-3 md:py-8 md:rounded-lg">
+                            <div className="w-full h-full overflow-y-auto text-center bg-[#ecf1f7]/70 dark:bg-[#020024]/70 py-3 md:py-8 md:rounded-lg">
                                 {loading ? (
-                                    <p className="text-gray-500">Loading arrivals…</p>
-                                ) : stopsWithArrivals.length === 0 ? (
-                                    <p className="text-gray-500">No nearby stops found.</p>
+                                    <p className="text-gray-500 text-lg">Loading arrivals…</p>
+                                ) : !hasAnyArrivals ? (
+                                    <p className="text-gray-500 text-lg">No arrivals found at nearby stops.</p>
                                 ) : (
-                                    <NearbyStops stops={stopsWithArrivals} />
+                                    <NearbyStops
+                                        stops={stopsWithArrivals.filter(stop => stop.arrivals && stop.arrivals.length > 0)}
+                                    />
                                 )}
                             </div>
                         )}
