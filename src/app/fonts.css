@@ -18,3 +18,31 @@
   font-weight: 700;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'Stack Sans Notch';
+  src: url('/fonts/stack-sans-notch-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Stack Sans Notch';
+  src: url('/fonts/stack-sans-notch-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Stack Sans Notch';
+  src: url('/fonts/stack-sans-notch-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Stack Sans Notch';
+  src: url('/fonts/stack-sans-notch-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}

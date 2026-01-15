@@ -32,7 +32,7 @@ export default function DynamicMap({ userPosition, stops }: MapProps) {
       center={userPosition}
       zoom={20}
       scrollWheelZoom={true}
-      className="w-full h-full"
+      className="w-full h-full rounded-lg"
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
@@ -85,7 +85,7 @@ export default function DynamicMap({ userPosition, stops }: MapProps) {
                     return (
                       <div
                         key={idx}
-                        className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+                        className="flex items-center gap-3 px-2.5 py-2 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
                       >
                         {/* Line Badge */}
                         <div className="bg-indigo-100 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-md min-w-[45px] text-center border-2 border-indigo-200">

@@ -71,7 +71,7 @@ const toggleStop = (stopId: string) => {
                       return (
                         <div
                           key={`${stop.stop_id}-${idx}`}
-                          className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 px-2.5 py-2 hover:bg-gray-50 transition-colors"
                         >
                           <div className="bg-indigo-100 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-md min-w-[45px] text-center border border-indigo-200">
                             {arr.line}

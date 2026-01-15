@@ -135,38 +135,83 @@ export default function BusFinder() {
         );
     };
 
+    const MapIcon = ({ className = "" }) => (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z" />
+            <path d="M9 4v14" />
+            <path d="M15 6v14" />
+        </svg>
+    );
+
+
+    const ListIcon = ({ className = "" }) => (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <circle cx="5" cy="6" r="1.5" />
+            <circle cx="5" cy="12" r="1.5" />
+            <circle cx="5" cy="18" r="1.5" />
+            <line x1="9" y1="6" x2="21" y2="6" />
+            <line x1="9" y1="12" x2="21" y2="12" />
+            <line x1="9" y1="18" x2="21" y2="18" />
+        </svg>
+    );
+
+
     return (
+
+
         <div className="flex flex-col flex-1 min-h-0">
             {/* Tabs + Button - Fixed, not sticky */}
-            <div className="flex-shrink-0 z-40 bg-white dark:bg-black border-b border-gray-200 px-2 md:px-0 py-2 touch-none">
+            <div className="flex-shrink-0 z-40 bg-white dark:bg-[#111827] px-2 md:px-0 py-2 touch-none">
                 <div className="flex items-center justify-between py-2">
                     {/* Left tabs */}
                     <div className="flex gap-2">
                         <button
                             onClick={() => setActiveTab("map")}
-                            className={`px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "map"
+                            className={`flex items-center gap-2 px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "map"
                                     ? "border-b-3 border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold"
-                                    : "text-gray-500"
+                                    : "text-gray-500 dark:text-gray-400"
                                 }`}
                         >
-                            Map
+                            <MapIcon className="h-5 w-5" />
+                            <span>Map</span>
                         </button>
+
                         <button
                             onClick={() => setActiveTab("stops")}
-                            className={`px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "stops"
+                            className={`flex items-center gap-2 px-4 py-2 -mb-px font-medium text-base md:text-lg ${activeTab === "stops"
                                     ? "border-b-3 border-[var(--brand-blue)] text-[var(--brand-blue)] font-semibold"
                                     : "text-gray-500"
                                 }`}
                         >
-                            List
+                            <ListIcon className="h-5 w-5" />
+                            <span>List</span>
                         </button>
+
                     </div>
 
                     {/* Right button */}
                     <button
                         onClick={handleUseMyLocation}
                         disabled={loading}
-                        className="flex items-center gap-2 rounded-md bg-[#4B4E6D] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-[#3F425D] font-semibold disabled:opacity-60"
+                        className="flex items-center gap-2 rounded-md bg-[var(--brand-dark-blue)] px-4 py-2 text-white text-base md:text-lg shadow-sm hover:bg-[#3F425D] font-semibold disabled:opacity-60"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
