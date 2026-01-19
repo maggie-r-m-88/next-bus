@@ -17,10 +17,10 @@ A **Next.js** app that shows **real-time Madrid bus arrivals** using the **EMT M
 npm install
 ```
 
-1. Go to https://www.hivemq.com/
-2. Sign up for a free account
-3. Create a new cluster
-4. Copy the following credentials:
-* Broker URL (HIVEMQ_BROKER_URL=mqtts://[url]:8884/mqtt, NEXT_PUBLIC_HIVEMQ_BROKER_URL=wss://[url]:8884/mqtt)
-* Port
-* Username/Password
+1. Go to https://mobilitylabs.emtmadrid.es/
+2. Register for a free account
+3. Add username and password to .ENV file
+
+```bash
+npm run dev
+```
