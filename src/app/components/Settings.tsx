@@ -35,8 +35,8 @@ export default function Settings({ radiusMeters, onApply }: SettingsProps) {
 
     const links = [
         {
-            label: "EMT Madrid Open Data API",
-            href: "https://datos.emtmadrid.es/",
+            label: "EMT Madrid Mobility Labs API",
+            href: "https://mobilitylabs.emtmadrid.es/",
         },
         {
             label: "Developer Website",

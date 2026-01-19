@@ -7,17 +7,20 @@ A **Next.js** app that shows **real-time Madrid bus arrivals** using the **EMT M
 ## Technologies Used
 
 - [Next.js](https://nextjs.org) – React framework for server-side rendering and static sites.  
-- [EMT Madrid Open Data API](https://datos.emtmadrid.es/) – Real-time bus data.  
+- [EMT Madrid Mobility Labs API](https://mobilitylabs.emtmadrid.es/) – Real-time bus data.  
 - [Leaflet](https://leafletjs.com/) – Interactive maps.  
 
 
 ## Getting Started
 
-Clone the repository:
-
 ```bash
 npm install
-
-npm run dev
 ```
 
+1. Go to https://www.hivemq.com/
+2. Sign up for a free account
+3. Create a new cluster
+4. Copy the following credentials:
+* Broker URL (HIVEMQ_BROKER_URL=mqtts://[url]:8884/mqtt, NEXT_PUBLIC_HIVEMQ_BROKER_URL=wss://[url]:8884/mqtt)
+* Port
+* Username/Password
