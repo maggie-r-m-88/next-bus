@@ -319,7 +319,7 @@ export default function BusFinder({ radiusMeters, onOpenSettings }: BusFinderPro
                         )}
 
                         {coords && activeTab === "stops" && (
-                            <div className="w-full h-full overflow-y-auto text-center bg-[#ecf1f7]/70 dark:bg-[#020024]/70 py-3 md:py-8 md:rounded-lg">
+                            <div className="w-full h-full overflow-y-auto text-center bg-[#ecf1f7]/70 dark:bg-[#020024]/70 py-3 px-3 md:px-0 md:py-8 md:rounded-lg">
                                 {loading ? (
                                     <p className="text-gray-500 text-lg">Loading arrivals…</p>
                                 ) : !hasAnyArrivals ? (
