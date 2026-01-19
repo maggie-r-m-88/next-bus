@@ -1,6 +1,6 @@
 ## EMT Near Me
 
-![EMT Near Me](public/emt-near-me-map-ss.png)
+![EMT Near Me](public/emt-near-me-map-ss.PNG)
 
 A **Next.js** app that shows **real-time Madrid bus arrivals** using the **EMT Madrid open data API**. Quickly find nearby bus stops and view arrival times for EMT buses.
 
